@@ -16,8 +16,10 @@ def read_metadata(file, path: str, attr_key: str) -> Any | None:
         file_read = file_read[path]
         output = np. array(file_read)
         return output
-    except:
+    except KeyError:
         print("Error: invalid data")
+    except:
+        print("Error")
     
 
 #2b, implement fucntion read_metadata, read the metadata and attribute of h5
@@ -43,22 +45,79 @@ def check_equal_length(*arrays: NDArray) -> bool:
             raise ValueError("invalid array")
     return True
 
+#3a, convert time data from miliseconds into seconds
 def process_time_data(data: NDArray) -> NDArray:
-    pass
+    #if data is empty return data
+    if data.size == 0:
+        return data
+    
+    start_time = data[0]
+    output = data.copy()
+    #convert data in miliseconds into seconds
+    for key, value in enumerate(output):
+        output[key] = (value - start_time)/1000
 
+    return(output)
 
+#3b, remove negative elements from the data
 def remove_negatives(array: NDArray) -> NDArray:
-    pass
+    if array.size == 0:
+        return array
+
+    output = array.copy()
+
+    #if value is negative replace value with np.nan
+    for key,value in enumerate(output):
+        if value < 0:
+            output[key] = np.nan
+    return output
 
 
+#3c, interpolate the array
 def linear_interpolation(
     time: NDArray, start_time: float, end_time: float, start_y: float, end_y: float
 ) -> NDArray:
-    pass
+    # if empty, return empty
+    if time.size == 0:
+        return time
+    
+    output = time.copy()
+
+    temp1 = end_y-start_y
+    temp2 = end_time-start_time
+
+    for key,value in enumerate(time):
+        output[key] = start_y + (temp1 * ((value-start_time)/temp2)) #mathematical equation
+
+    return output
 
 
+#3d, Interpolate NaN data
 def interpolate_nan_data(time: NDArray, y_data: NDArray) -> NDArray:
-    pass
+    #Check if interpolation is possible
+    if np.isnan.isnan(y_data[0]) or np.isnan(y_data[-1]):
+        raise ValueError("Data cannot be interpolated")
+    
+    #Declare variables
+    active_gap = False
+    interpolated_data = y_data.copy()
+
+    for key,value in enumerate(y_data):
+        #Start an index
+        if(not active_gap and np.isnan(value)):
+            start_index = key
+            active_gap = True
+        #Stop indexing and interpolate
+        elif(active_gap and not np.isnan(value)):
+            end_index = key
+            active_gap = False
+
+            #time[start_index-1]=x1,time[end_index]=x2
+            #y_data[start_index-1]=y1,y_data[end_index]=y2
+            #run linear_interpolation on specific section of the array
+            interpolated_data[start_index:end_index] = linear_interpolation(time[start_index:end_index], time[start_index-1], time[end_index], y_data[start_index-1], y_data[end_index])
+
+    return interpolated_data
 
 
 def filter_data(data: NDArray, window_size: int) -> NDArray:
@@ -77,7 +136,21 @@ def filter_data(data: NDArray, window_size: int) -> NDArray:
     for i in range(pad_width, padded_data.size - pad_width):
         # Implementieren Sie hier den SMA!
         sma = []
-        output.append(sma)
+        # Set upper boundary
+        if(i-pad_width<=pad_width):
+            left_window_index = pad_width
+        else:
+            left_window_index = i-pad_width
+
+        # Set lower boundary
+        if(i+pad_width>=(padded_data.size-pad_width)):
+            right_window_index = (padded_data.size - pad_width)
+        else:
+            right_window_index = i+pad_width+1
+        sma = padded_data[left_window_index:right_window_index] #slice
+        sma = np.mean(sma)
+
+        output.append(sma) #add to data list
     return np.array(output)
 
 

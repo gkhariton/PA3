@@ -40,7 +40,29 @@ def main():
         raw_data[i] = fn.read_data(file_path, brewing+"/"+tank_id+"/"+i)
 
     #2e, check array size
-    fn.check_equal_length(raw_data["level"], raw_data["temperature"], rad_data["timestamp"])
+    fn.check_equal_length(raw_data["level"], raw_data["temperature"], raw_data["timestamp"])
+
+    #3f, declare dictionary and tuple
+    processed_data = {}
+    df_data = {}
+    filter_sizes = (10, 25, 58, 204) #custom filter width
+
+
+    #convert timestamp data
+    df_data["time"] = fn.process_time_data(raw_data["timestamp"])
+
+    #remove negatives from the data
+    NaN_level_data = fn.remove.negatives(raw_data["level"])
+    #interpolate the data
+    interpolated_level_data = fn.interpolate_nan_data(raw_data["timestamp"], NaN_level_data)
+
+    #loop
+    for i in filter_sizes:
+        #filter temperature data
+        processed_data["temperature_k_"+str(i)] = fn.filter_data(raw_data["temperature"],i)
+        #filter interpolated level data
+        processed_data["leve_k_"+str(i)] = fn.filter_data(interpolated_level_data, i)
+    
 
 if __name__ == "__main__":
     main()
