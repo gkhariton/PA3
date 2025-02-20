@@ -4,9 +4,11 @@ import os
 import numpy as np
 import project.functions as fn
 
+import h5py
+
 def main():
     #1a, declare variables
-    file_path = os.path.join("project", "data", "data_GdD_Datensatz_WS2425.h5")
+    file_path = "C:\\Users\ACER\Downloads\pa-ws2425\pa-ws2425\project\data\data_GdD_Datensatz_WS2425.h5"
     brewing = "brewing_001"
     tank_id = "B001"
 
@@ -63,6 +65,8 @@ def main():
         #filter interpolated level data
         processed_data["leve_k_"+str(i)] = fn.filter_data(interpolated_level_data, i)
     
+    
 
 if __name__ == "__main__":
     main()
+    

@@ -10,16 +10,19 @@ from plotid.publish import publish
 from plotid.tagplot import tagplot
 
 #1c, implement fucntion read_metadata, read the metadata and attribute of h5
-def read_metadata(file, path: str, attr_key: str) -> Any | None:
+def read_metadata(file: str, path: str, attr_key: str) -> Any | None:
     try:
         file_read = h5.File(file,"r")
         file_read = file_read[path]
-        output = np. array(file_read)
-        return output
+        output = file_read.attrs[attr_key]
+        return (output)
+    
     except KeyError:
         print("Error: invalid data")
+
     except:
         print("Error")
+        
     
 
 #2b, implement fucntion read_metadata, read the metadata and attribute of h5
@@ -36,7 +39,7 @@ def read_data(file: str, path: str) -> NDArray | None:
 #2c, check if array length are uniform
 def check_equal_length(*arrays: NDArray) -> bool:
     # if array is empty return false
-    if arrays: 
+    if not arrays: 
         return False
 
     array_size = len(arrays[0].shape)
@@ -156,13 +159,13 @@ def filter_data(data: NDArray, window_size: int) -> NDArray:
 
 
 def calc_heater_heat_flux(P_heater: float, eta_heater: float) -> float:
-    pass
+    return (P_heater*eta_heater)
 
 
 def calc_convective_heat_flow(
     k_tank: float, area_tank: float, t_total: float, t_env: float
 ) -> float:
-    pass
+    return (k_tank*area_tank*(t_total-t_env))
 
 
 def calc_mass_flow(

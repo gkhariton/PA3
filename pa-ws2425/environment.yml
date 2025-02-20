@@ -1,0 +1,23 @@
+name: gdd-uebung
+channels:
+  - conda-forge
+dependencies:
+  - python==3.12.4
+  - numpy
+  - scipy
+  - pandas
+  - matplotlib
+  - h5py
+  - ruff
+  - pytables
+  - jupyter
+  - jupyterlab
+  - pytest
+  - pytest-timeout
+  - hypothesis
+  - jupyterlab-h5web
+  - pip
+  - pip:
+      - plotid
+      - pycodestyle_magic
+      - jupyterlab_rise
