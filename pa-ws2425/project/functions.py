@@ -10,8 +10,18 @@ from plotid.publish import publish
 from plotid.tagplot import tagplot
 
 
-def read_metadata(file: str, path: str, attr_key: str) -> Any | None:
-    pass
+def read_metadata(file_path, path: str, attr_key: str) -> Any | None:
+    try:
+        file_read = h5.File(file,"r")
+        file_read = file_read[path]
+        output = np. array(file_read)
+        return output
+        except:
+            print("Error: file or path invalid")
+            return None
+            
+
+
 
 
 def read_data(file: str, path: str) -> NDArray | None:

@@ -13,5 +13,7 @@ tank_id = "B001"
 
 measured_quantities = ("level", "temperature", "timestamp")
 
+read_metadata()
+
 if __name__ == "__main__":
     main()
