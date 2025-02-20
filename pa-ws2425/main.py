@@ -4,8 +4,6 @@ import os
 import numpy as np
 import project.functions as fn
 
-import h5py
-
 def main():
     #1a, declare variables
     file_path = "C:\\Users\ACER\Downloads\pa-ws2425\pa-ws2425\project\data\data_GdD_Datensatz_WS2425.h5"
@@ -107,6 +105,14 @@ def main():
     }
 
     fn.store_plot_data(df_data, h5_path, group_path, metadata) #store data
+
+    plot_data = fn.read_plot_data(h5_path, group_path) #read plot
+    plot_figure = fn.plot_data(plot_data[0], plot_data[1])#plot data
+
+    source_file = ["./main.py", "./project/functions.py", "./tests/data_GdD_plot_WS2425.h5"]
+    destination_path = "./plotid"
+
+    fn.publish_plot(plot_figure, source_file, destination_path)
 
 if __name__ == "__main__":
     main()

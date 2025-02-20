@@ -186,11 +186,13 @@ def calc_transported_power(
 def store_plot_data(
     data: dict[str, NDArray], file_path: str, group_path: str, metadata: dict[str, Any]
 ) -> None:
+    #convert dictionary to DataFrane
     dataframe = pd.DataFrame(data)
 
     with pd.HDFStore(file_path, mode="w") as file_write:
         file_write.put(group_path, dataframe, format="table")
 
+        #store metadata as attributes
         for key,value in metadata.items():
             file_write.get_storer(group_path).attrs[key] = value
     
@@ -217,14 +219,43 @@ def read_plot_data(
 
 
 def plot_data(data: pd.DataFrame, formats: dict[str, str]) -> Figure:
-    pass
+    fig, current_plot = plt.subplots(figsize=(10, 10))
 
+    time_second = data["time"]
+    time_hour = time_second / 3600
+
+    inner_energy_204_giga = data["inner_energy_k_204"] / 1000000
+    inner_energy_58_giga = data["inner_energy_k_58"] / 1000000
+    inner_energy_25_giga = data["inner_energy_k_25"] / 1000000
+    inner_energy_10_giga = data["inner_energy_k_10"] / 1000000
+
+    #plot for every filter size
+    current_plot.plot(time_hour, inner_energy_204_giga, label="Internal Energy k_204", color="#1f77b4", linewidth=0.5, alpha=0.7)
+    current_plot.plot(time_hour, inner_energy_58_giga, label="Internal Energy k_58", color="#1f77b4", linewidth=0.5, alpha=0.7)
+    current_plot.plot(time_hour, inner_energy_25_giga, label="Internal Energy k_25", color="#1f77b4", linewidth=0.5, alpha=0.7)
+    current_plot.plot(time_hour, inner_energy_10_giga, label="Internal Energy k_10", color="#1f77b4", linewidth=0.5, alpha=0.7)
+
+    #format from dictionary
+    current_plot.set_xlabel(formats.get("xlabel", "Time (s)"))
+    current_plot.set_ylabel(formats.get("ylabel", "Internal Energy (GJ)"))
+    current_plot.set_title(formats.get("title", "Internal Energy over time (GJ/s)"))
+    current_plot.legend()
+
+    current_plot.grid(True, linestyle="--", alpha=0.7)
+
+    return fig
 
 def publish_plot(
     fig: Figure, source_paths: str | list[str], destination_path: str
 ) -> None:
-    pass
+    #Save with tagplot
+    try:
+        plot_id = tagplot(fig, engine="matplotlib", figure_ids =["GdD_WS_2425_2593450"], id_on_plot=True, fontsize=12)
+        publish(plot_id, source_paths, destination_path)
+    except:
+        print("Error")
 
+    print("Plot and data published to "+destination_path)
 
 if __name__ == "__main__":
     pass
