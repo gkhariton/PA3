@@ -54,18 +54,47 @@ def main():
     df_data["time"] = fn.process_time_data(raw_data["timestamp"])
 
     #remove negatives from the data
-    NaN_level_data = fn.remove.negatives(raw_data["level"])
+    NaN_level_data = fn.remove_negatives(raw_data["level"])
     #interpolate the data
     interpolated_level_data = fn.interpolate_nan_data(raw_data["timestamp"], NaN_level_data)
 
-    #loop
+    brewing_heater_power = fn.read_metadata(file_path, brewing+"/"+tank_id, "power_heater")
+    brewing_heater_efficiency = fn.read_metadata(file_path, brewing+"/"+tank_id, "efficiency_heater")
+
+    #power supplied by heating plate
+    supplied_power = fn.calc_heater_heat_flux(brewing_heater_power, brewing_heater_efficiency)
+    #initial internal energy
+    initial_internal_energy = fn.calc_transported_power(brewing_mass_tank, brewing_specific_heat_capacity_tank, brewing_T_env)
+    
+    #filter sizes loop,  
     for i in filter_sizes:
         #filter temperature data
         processed_data["temperature_k_"+str(i)] = fn.filter_data(raw_data["temperature"],i)
         #filter interpolated level data
         processed_data["leve_k_"+str(i)] = fn.filter_data(interpolated_level_data, i)
+        inner_energy = []
     
-    
+        converted_interpolated_level_data = processed_data["leve_k_"+str(i)].copy()
+
+        for key,value in enumerate(converted_interpolated_level_data):
+            #convert fill level from mm to m
+            converted_interpolated_level_data[key] = value / 1000
+
+        #mass of brew array over time
+        mass_over_time = fn.calc_mass_flow(converted_interpolated_level_data, brewing_footprint_tank, brewing_density_beer)
+
+    #time loop
+    for key,value in enumerate(df_data["time"]):
+        heat_waste = fn.calc_convective_heat_flow(brewing_heat_transfer_coeff_tank, brewing_surface_area_tank, raw_data["temperature"][key], brewing_T_env)
+
+        #internal energy of beer assuming its temperature is identical to that of the tank
+        energy_of_brew = fn.calc_transported_power(mass_over_time[key], brewing_specific_heat_capacity_beer, processed_data["temperature_k_"+str(i)][key])
+
+        #total energy
+        calculated_energy = supplied_power-heat_waste+energy_of_brew+initial_internal_energy
+        inner_energy.append(calculated_energy)
+
+    df_data["inner_energy_k_"+str(i)] = np.array(inner_energy)
 
 if __name__ == "__main__":
     main()

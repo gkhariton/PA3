@@ -171,13 +171,16 @@ def calc_convective_heat_flow(
 def calc_mass_flow(
     level_data: NDArray, tank_footprint: float, density: float
 ) -> NDArray:
-    pass
+    output = level_data.copy()
+    for key,value in enumerate(level_data):
+        output[key] = value*tank_footprint*density
+    return output
 
 
 def calc_transported_power(
     mass_flow: float, specific_heat_capacity: float, temperature: float
 ) -> float:
-    pass
+    return(mass_flow*specific_heat_capacity*temperature)
 
 
 def store_plot_data(
