@@ -29,8 +29,18 @@ def main():
     brewing_heat_transfer_coeff_tank = fn.read_metadata(file_path, brewing+"/"+tank_id, "heat_transfer_coeff_tank")
     brewing_specific_heat_capacity_tank = fn.read_metadata(file_path, brewing+"/"+tank_id, "specific_heat_capacity_tank")
 
-    #1f, create a dictionary
-    df_data={}
+    #1f, create df_data dictionary
+    df_data = {}
+
+    #2a, create raw_data dictionary
+    raw_data = {}
+
+    #2a adn 2d, create loop that repeats for measured_quantities times. Store data in raw_data dictionary
+    for i in measured_quantities:
+        raw_data[i] = fn.read_data(file_path, brewing+"/"+tank_id+"/"+i)
+
+    #2e, check array size
+    fn.check_equal_length(raw_data["level"], raw_data["temperature"], rad_data["timestamp"])
 
 if __name__ == "__main__":
     main()

@@ -10,27 +10,38 @@ from plotid.publish import publish
 from plotid.tagplot import tagplot
 
 #1c, implement fucntion read_metadata, read the metadata and attribute of h5
-def read_metadata(file_path, path: str, attr_key: str) -> Any | None:
+def read_metadata(file, path: str, attr_key: str) -> Any | None:
     try:
         file_read = h5.File(file,"r")
         file_read = file_read[path]
         output = np. array(file_read)
         return output
-        except:
-            print("Error: file or path invalid")
-            return None
+    except:
+        print("Error: invalid data")
+    
 
-
-
-
-
+#2b, implement fucntion read_metadata, read the metadata and attribute of h5
 def read_data(file: str, path: str) -> NDArray | None:
-    pass
+    try:
+        file_read = h5.File(file,"r")
+        file_read = file_read[path]
+        output = np.array(file_read)
+        return output
+    except:
+        print("Error: invalid file/path")
+        return None
 
-
+#2c, check if array length are uniform
 def check_equal_length(*arrays: NDArray) -> bool:
-    pass
+    # if array is empty return false
+    if arrays: 
+        return False
 
+    array_size = len(arrays[0].shape)
+    for i in arrays:
+        if(array_size != len(i.shape)):
+            raise ValueError("invalid array")
+    return True
 
 def process_time_data(data: NDArray) -> NDArray:
     pass
