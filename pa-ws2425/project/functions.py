@@ -9,7 +9,7 @@ import pandas as pd
 from plotid.publish import publish
 from plotid.tagplot import tagplot
 
-
+#1c, implement fucntion read_metadata, read the metadata and attribute of h5
 def read_metadata(file_path, path: str, attr_key: str) -> Any | None:
     try:
         file_read = h5.File(file,"r")
@@ -19,7 +19,7 @@ def read_metadata(file_path, path: str, attr_key: str) -> Any | None:
         except:
             print("Error: file or path invalid")
             return None
-            
+
 
 
 
