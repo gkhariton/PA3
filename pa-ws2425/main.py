@@ -96,6 +96,18 @@ def main():
 
     df_data["inner_energy_k_"+str(i)] = np.array(inner_energy)
 
+    h5_path = "C:\\Users\ACER\Downloads\pa-ws2425\pa-ws2425\tests\data_GdD_plot_WS2425.h5"
+    group_path = "energy_level"
+    metadata = {
+    "legend_title": "Energy level of Brew001, Tank001 over time",
+    "x_label": "Time",
+    "x_unit" : "seconds",
+    "y_label": "Energy level",
+    "y_unit" : "Joules"
+    }
+
+    fn.store_plot_data(df_data, h5_path, group_path, metadata) #store data
+
 if __name__ == "__main__":
     main()
     

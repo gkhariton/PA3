@@ -186,13 +186,34 @@ def calc_transported_power(
 def store_plot_data(
     data: dict[str, NDArray], file_path: str, group_path: str, metadata: dict[str, Any]
 ) -> None:
-    pass
+    dataframe = pd.DataFrame(data)
 
+    with pd.HDFStore(file_path, mode="w") as file_write:
+        file_write.put(group_path, dataframe, format="table")
+
+        for key,value in metadata.items():
+            file_write.get_storer(group_path).attrs[key] = value
+    
+    print("Data and Metadata stored in "+file_path+"under"+group_path)
 
 def read_plot_data(
     file_path: str, group_path: str
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
-    pass
+    with pd.HDFStore(file_path, mode="r") as file_read:
+        dataframe = file_read.get(group_path)
+
+        output_metadata = {}
+
+        try:
+            output_metadata["legend_title"] - file_read.get_storer(group_path).attrs.legend_title
+            output_metadata["x_label"] = file_read.get_storer(group_path).attrs.x_label
+            output_metadata["x_unit"] = file_read.get_storer(group_path).attrs.x_unit
+            output_metadata["y_label"] = file_read.get_storer(group_path).attrs.y_label
+            output_metadata["y_unit"] = file_read.get_storer(group_path).attrs.y_unit
+        except KeyError:
+            print("No metadata found")
+
+    return dataframe, output_metadata
 
 
 def plot_data(data: pd.DataFrame, formats: dict[str, str]) -> Figure:
